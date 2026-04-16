@@ -11,10 +11,11 @@
       background: #1a1a2e;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
       font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif;
       color: #eee;
+      padding: 16px;
     }
 
     #app {
@@ -23,12 +24,74 @@
       align-items: flex-start;
     }
 
+    #board-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
     #game-board {
       border: 3px solid #4a90d9;
       background: #0d0d1a;
       box-shadow: 0 0 20px rgba(74, 144, 217, 0.5);
+      display: block;
     }
 
+    /* ===================== TOUCH CONTROLS ===================== */
+    #touch-controls {
+      width: 306px;
+      padding: 10px 4px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .touch-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .touch-btn {
+      flex: 1;
+      height: 60px;
+      background: rgba(74, 144, 217, 0.12);
+      border: 2px solid #4a90d9;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      transition: background 0.08s;
+    }
+
+    .touch-btn span.label {
+      font-size: 10px;
+      color: #8ab4d9;
+      letter-spacing: 0.5px;
+    }
+
+    .touch-btn:active,
+    .touch-btn.pressed {
+      background: rgba(74, 144, 217, 0.40);
+      border-color: #7ab8f0;
+    }
+
+    /* Desktop: hide touch controls by default */
+    @media (min-width: 561px) {
+      #touch-controls { display: none; }
+    }
+
+    /* ===================== SIDE PANEL ===================== */
     #side-panel {
       width: 160px;
       display: flex;
@@ -90,9 +153,27 @@
       margin-right: 4px;
     }
 
+    #bgm-btn {
+      background: none;
+      border: 2px solid #4a90d9;
+      color: #4a90d9;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      width: 100%;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+    #bgm-btn:hover { background: rgba(74,144,217,0.15); }
+    #bgm-btn.muted { border-color: #444; color: #555; }
+
+    /* ===================== OVERLAY ===================== */
     #overlay {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0; left: 0; right: 0;
+      height: 606px; /* canvas height + borders */
       background: rgba(0,0,0,0.75);
       display: flex;
       flex-direction: column;
@@ -124,53 +205,69 @@
       font-family: inherit;
       transition: background 0.2s;
     }
-
     #start-btn:hover { background: #357abd; }
 
-    #board-wrapper {
-      position: relative;
-    }
+    /* ===================== MOBILE LAYOUT (≤ 560px) ===================== */
+    @media (max-width: 560px) {
+      body {
+        padding: 8px 4px;
+        align-items: flex-start;
+      }
 
-    #level-badge {
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
-    }
+      #app {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+      }
 
-    #lines-badge {
-      font-size: 20px;
-      font-weight: bold;
-      color: #fff;
-    }
+      /* Compact horizontal stats bar above canvas */
+      #side-panel {
+        width: 306px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
 
-    #bgm-btn {
-      background: none;
-      border: 2px solid #4a90d9;
-      color: #4a90d9;
-      padding: 6px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 12px;
-      width: 100%;
-      transition: all 0.2s;
-      letter-spacing: 0.5px;
+      .panel-box {
+        flex: 1;
+        min-width: 60px;
+        padding: 8px 10px;
+      }
+
+      .panel-box h3 {
+        font-size: 10px;
+        margin-bottom: 3px;
+      }
+
+      .panel-box p {
+        font-size: 16px;
+      }
+
+      #panel-next {
+        flex: 0 0 90px;
+      }
+
+      #next-canvas {
+        width: 80px;
+        height: 54px;
+      }
+
+      /* Hide desktop instructions on mobile */
+      #instructions {
+        display: none;
+      }
+
+      /* Show touch controls */
+      #touch-controls {
+        display: flex;
+      }
     }
-    #bgm-btn:hover { background: rgba(74,144,217,0.15); }
-    #bgm-btn.muted { border-color: #444; color: #555; }
   </style>
 </head>
 <body>
 <div id="app">
-  <div id="board-wrapper">
-    <canvas id="game-board" width="300" height="600"></canvas>
-    <div id="overlay">
-      <h2>テトリス</h2>
-      <p>ブロックを積み上げて列を消そう！</p>
-      <button id="start-btn">ゲームスタート</button>
-    </div>
-  </div>
-
+  <!-- On mobile, side panel renders above the board via flex-direction:column -->
   <div id="side-panel">
     <div class="panel-box">
       <h3>スコア</h3>
@@ -184,7 +281,7 @@
       <h3>ライン</h3>
       <p id="lines-badge">0</p>
     </div>
-    <div class="panel-box">
+    <div class="panel-box" id="panel-next">
       <h3>NEXT</h3>
       <canvas id="next-canvas" width="120" height="80"></canvas>
     </div>
@@ -209,6 +306,38 @@
       <button id="bgm-btn">♪ BGM ON (カリンカ)</button>
     </div>
   </div>
+
+  <div id="board-wrapper">
+    <canvas id="game-board" width="300" height="600"></canvas>
+    <div id="overlay">
+      <h2>テトリス</h2>
+      <p>ブロックを積み上げて列を消そう！</p>
+      <button id="start-btn">ゲームスタート</button>
+    </div>
+
+    <!-- Touch controls (shown on mobile) -->
+    <div id="touch-controls">
+      <div class="touch-row">
+        <button class="touch-btn" id="btn-left">
+          ◀<span class="label">左移動</span>
+        </button>
+        <button class="touch-btn" id="btn-rotate">
+          ↻<span class="label">回転</span>
+        </button>
+        <button class="touch-btn" id="btn-right">
+          ▶<span class="label">右移動</span>
+        </button>
+      </div>
+      <div class="touch-row">
+        <button class="touch-btn" id="btn-down">
+          ▼<span class="label">落下加速</span>
+        </button>
+        <button class="touch-btn" id="btn-hard">
+          ⬇<span class="label">即落下</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -221,13 +350,8 @@ const CELL = 30;
 
 const COLORS = [
   null,
-  '#00cfcf', // I
-  '#0000cf', // J
-  '#cf7f00', // L
-  '#cfcf00', // O
-  '#00cf00', // S
-  '#9f00cf', // T
-  '#cf0000', // Z
+  '#00cfcf', '#0000cf', '#cf7f00', '#cfcf00',
+  '#00cf00', '#9f00cf', '#cf0000',
 ];
 
 const SHAPES = [
@@ -243,16 +367,16 @@ const SHAPES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
-const canvas   = document.getElementById('game-board');
-const ctx      = canvas.getContext('2d');
-const nextCanvas = document.getElementById('next-canvas');
-const nextCtx  = nextCanvas.getContext('2d');
+const canvas       = document.getElementById('game-board');
+const ctx          = canvas.getContext('2d');
+const nextCanvas   = document.getElementById('next-canvas');
+const nextCtx      = nextCanvas.getContext('2d');
 const scoreDisplay = document.getElementById('score-display');
 const levelBadge   = document.getElementById('level-badge');
 const linesBadge   = document.getElementById('lines-badge');
-const overlay  = document.getElementById('overlay');
-const startBtn = document.getElementById('start-btn');
-const bgmBtn   = document.getElementById('bgm-btn');
+const overlay      = document.getElementById('overlay');
+const startBtn     = document.getElementById('start-btn');
+const bgmBtn       = document.getElementById('bgm-btn');
 
 let board, piece, nextPiece, score, level, lines;
 let gameOver, paused, animId, dropInterval, lastTime, dropCounter;
@@ -263,104 +387,73 @@ let gameOver, paused, animId, dropInterval, lastTime, dropCounter;
 let audioCtx = null;
 let bgmOn = true;
 let bgmTimerId = null;
-let bgmNoteIdx = 0;
-let bgmNextTime = 0;
-let bassNoteIdx = 0;
-let bassNextTime = 0;
+let bgmNoteIdx = 0, bgmNextTime = 0;
+let bassNoteIdx = 0, bassNextTime = 0;
 
 function getAC() {
-  if (!audioCtx || audioCtx.state === 'closed') {
+  if (!audioCtx || audioCtx.state === 'closed')
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
 
-function midiHz(n) {
-  return n === 0 ? 0 : 440 * Math.pow(2, (n - 69) / 12);
-}
+function midiHz(n) { return n ? 440 * Math.pow(2, (n-69)/12) : 0; }
 
-// Play a single tone at a scheduled time
 function tone(midi, when, dur, vol, wave) {
   if (!midi) return;
   const ac = getAC();
-  const osc  = ac.createOscillator();
-  const gain = ac.createGain();
-  const atk  = 0.008;
-  const rel  = Math.min(0.04, dur * 0.15);
+  const osc = ac.createOscillator(), g = ac.createGain();
+  const rel = Math.min(0.04, dur * 0.15);
   osc.type = wave || 'square';
   osc.frequency.value = midiHz(midi);
-  gain.gain.setValueAtTime(0, when);
-  gain.gain.linearRampToValueAtTime(vol, when + atk);
-  gain.gain.setValueAtTime(vol, when + dur - rel);
-  gain.gain.linearRampToValueAtTime(0, when + dur);
-  osc.connect(gain);
-  gain.connect(ac.destination);
-  osc.start(when);
-  osc.stop(when + dur + 0.05);
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(vol, when + 0.008);
+  g.gain.setValueAtTime(vol, when + dur - rel);
+  g.gain.linearRampToValueAtTime(0, when + dur);
+  osc.connect(g); g.connect(ac.destination);
+  osc.start(when); osc.stop(when + dur + 0.05);
 }
 
-// ---- Kalinka melody (D minor, BPM 132) ----
-// Format: [midiNote, beats]  (0 = rest)
-// D5=74, C5=72, Bb4=70, A4=69, G4=67, Eb5=75
-const BGM_BPM = 132;
-const BGM_BEAT = 60 / BGM_BPM; // seconds per beat
+const BGM_BEAT = 60 / 132;
 
 const MELODY = [
-  // ===== Part A: D minor, middle octave =====
-  // phrase 1: "Kalinka kalinka kalinka moya!"
   [74,1],[74,1],[74,1],[0,1],
-  [69,0.5],[70,0.5],[72,1],[72,1],
-  [72,0.5],[74,0.5],[75,1],[74,1],
+  [69,.5],[70,.5],[72,1],[72,1],
+  [72,.5],[74,.5],[75,1],[74,1],
   [72,2],[69,2],
-  // phrase 2: "V sadu yagoda malinka, malinka moya!"
   [74,1],[74,1],[74,1],[0,1],
-  [69,0.5],[70,0.5],[72,1],[72,1],
-  [72,0.5],[74,0.5],[75,1],[74,1],
+  [69,.5],[70,.5],[72,1],[72,1],
+  [72,.5],[74,.5],[75,1],[74,1],
   [74,4],
-
-  // ===== Part B: same melody, octave up =====
-  // phrase 1
   [86,1],[86,1],[86,1],[0,1],
-  [81,0.5],[82,0.5],[84,1],[84,1],
-  [84,0.5],[86,0.5],[87,1],[86,1],
+  [81,.5],[82,.5],[84,1],[84,1],
+  [84,.5],[86,.5],[87,1],[86,1],
   [84,2],[81,2],
-  // phrase 2
   [86,1],[86,1],[86,1],[0,1],
-  [81,0.5],[82,0.5],[84,1],[84,1],
-  [84,0.5],[86,0.5],[87,1],[86,1],
+  [81,.5],[82,.5],[84,1],[84,1],
+  [84,.5],[86,.5],[87,1],[86,1],
   [86,4],
 ];
 
-// Simple bass: alternates D3 / A3 every 2 beats
-const BASS = [
-  [50,2],[57,2],  // D3, A3
-];
+const BASS = [[50,2],[57,2]];
 
 function scheduleMelody() {
   if (!bgmOn) return;
-  const ac = getAC();
-  const now = ac.currentTime;
-  const ahead = 2.0;
-
+  const ac = getAC(), now = ac.currentTime, ahead = 2.0;
   while (bgmNextTime < now + ahead) {
-    const [n, beats] = MELODY[bgmNoteIdx % MELODY.length];
-    const dur = beats * BGM_BEAT;
-    if (n) tone(n, bgmNextTime, dur * 0.82, 0.18, 'square');
-    bgmNextTime += dur;
-    bgmNoteIdx++;
-    if (bgmNoteIdx >= MELODY.length) bgmNoteIdx = 0;
+    const [n, b] = MELODY[bgmNoteIdx % MELODY.length];
+    const d = b * BGM_BEAT;
+    if (n) tone(n, bgmNextTime, d * 0.82, 0.18, 'square');
+    bgmNextTime += d;
+    if (++bgmNoteIdx >= MELODY.length) bgmNoteIdx = 0;
   }
-
   while (bassNextTime < now + ahead) {
-    const [n, beats] = BASS[bassNoteIdx % BASS.length];
-    const dur = beats * BGM_BEAT;
-    if (n) tone(n, bassNextTime, dur * 0.6, 0.10, 'triangle');
-    bassNextTime += dur;
-    bassNoteIdx++;
-    if (bassNoteIdx >= BASS.length) bassNoteIdx = 0;
+    const [n, b] = BASS[bassNoteIdx % BASS.length];
+    const d = b * BGM_BEAT;
+    if (n) tone(n, bassNextTime, d * 0.6, 0.10, 'triangle');
+    bassNextTime += d;
+    if (++bassNoteIdx >= BASS.length) bassNoteIdx = 0;
   }
-
   bgmTimerId = setTimeout(scheduleMelody, 500);
 }
 
@@ -368,10 +461,8 @@ function startBGM() {
   if (!bgmOn) return;
   stopBGM();
   const ac = getAC();
-  bgmNextTime  = ac.currentTime + 0.1;
-  bassNextTime = ac.currentTime + 0.1;
-  bgmNoteIdx   = 0;
-  bassNoteIdx  = 0;
+  bgmNextTime = bassNextTime = ac.currentTime + 0.1;
+  bgmNoteIdx = bassNoteIdx = 0;
   scheduleMelody();
 }
 
@@ -381,156 +472,130 @@ function stopBGM() {
 
 function toggleBGM() {
   bgmOn = !bgmOn;
-  bgmBtn.textContent = bgmOn ? '♪ BGM ON (カリンカ)' : '♪ BGM OFF';
-  bgmBtn.classList.toggle('muted', !bgmOn);
-  if (bgmOn) {
-    if (!gameOver && !paused) startBGM();
-  } else {
-    stopBGM();
+  if (bgmBtn) {
+    bgmBtn.textContent = bgmOn ? '♪ BGM ON (カリンカ)' : '♪ BGM OFF';
+    bgmBtn.classList.toggle('muted', !bgmOn);
   }
+  bgmOn ? (!gameOver && !paused && startBGM()) : stopBGM();
 }
 
-// ---- Sound effects ----
 function sfxLineClear(n) {
-  const ac = getAC();
-  const t = ac.currentTime;
-  const pitches = [72, 76, 79, 84]; // C5 E5 G5 C6
-  for (let i = 0; i < Math.min(n + 1, 4); i++) {
-    tone(pitches[i], t + i * 0.07, 0.18, 0.28, 'sine');
-  }
+  const ac = getAC(), t = ac.currentTime;
+  [72,76,79,84].slice(0, Math.min(n+1,4)).forEach((p,i) => tone(p, t+i*0.07, 0.18, 0.28, 'sine'));
 }
 
 function sfxDrop() {
-  const ac = getAC();
-  const t = ac.currentTime;
-  // Short percussive thud
-  const osc = ac.createOscillator();
-  const g   = ac.createGain();
+  const ac = getAC(), t = ac.currentTime;
+  const osc = ac.createOscillator(), g = ac.createGain();
   osc.type = 'sine';
   osc.frequency.setValueAtTime(120, t);
-  osc.frequency.exponentialRampToValueAtTime(40, t + 0.08);
+  osc.frequency.exponentialRampToValueAtTime(40, t+0.08);
   g.gain.setValueAtTime(0.3, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+  g.gain.exponentialRampToValueAtTime(0.001, t+0.08);
   osc.connect(g); g.connect(ac.destination);
-  osc.start(t); osc.stop(t + 0.1);
+  osc.start(t); osc.stop(t+0.1);
 }
 
 function sfxGameOver() {
-  const ac = getAC();
-  const t = ac.currentTime;
-  [69, 62, 57, 50].forEach((n, i) => tone(n, t + i * 0.18, 0.25, 0.25, 'sawtooth'));
+  const ac = getAC(), t = ac.currentTime;
+  [69,62,57,50].forEach((n,i) => tone(n, t+i*0.18, 0.25, 0.25, 'sawtooth'));
 }
 
 // =====================================================
 //  GAME LOGIC
 // =====================================================
 function createBoard() {
-  return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
+  return Array.from({length:ROWS}, () => new Array(COLS).fill(0));
 }
 
 function randomPiece() {
-  const id = Math.floor(Math.random() * 7) + 1;
-  const shape = SHAPES[id].map(r => [...r]);
-  return { id, shape, x: Math.floor(COLS/2) - Math.ceil(shape[0].length/2), y: 0 };
+  const id = Math.floor(Math.random()*7)+1;
+  const shape = SHAPES[id].map(r=>[...r]);
+  return { id, shape, x: Math.floor(COLS/2)-Math.ceil(shape[0].length/2), y:0 };
 }
 
 function rotate(shape) {
-  const n = shape.length, m = shape[0].length;
-  const rot = Array.from({ length: m }, () => new Array(n).fill(0));
-  for (let r = 0; r < n; r++)
-    for (let c = 0; c < m; c++)
-      rot[c][n-1-r] = shape[r][c];
+  const n=shape.length, m=shape[0].length;
+  const rot = Array.from({length:m}, ()=>new Array(n).fill(0));
+  for (let r=0;r<n;r++) for (let c=0;c<m;c++) rot[c][n-1-r]=shape[r][c];
   return rot;
 }
 
 function collides(b, p, ox=0, oy=0, shape=p.shape) {
-  for (let r = 0; r < shape.length; r++) {
-    for (let c = 0; c < shape[r].length; c++) {
+  for (let r=0;r<shape.length;r++)
+    for (let c=0;c<shape[r].length;c++) {
       if (!shape[r][c]) continue;
-      const nx = p.x + c + ox, ny = p.y + r + oy;
-      if (nx < 0 || nx >= COLS || ny >= ROWS) return true;
-      if (ny >= 0 && b[ny][nx]) return true;
+      const nx=p.x+c+ox, ny=p.y+r+oy;
+      if (nx<0||nx>=COLS||ny>=ROWS) return true;
+      if (ny>=0&&b[ny][nx]) return true;
     }
-  }
   return false;
 }
 
-function merge(b, p) {
-  p.shape.forEach((row, r) => row.forEach((v, c) => { if (v) b[p.y+r][p.x+c] = v; }));
+function merge(b,p) {
+  p.shape.forEach((row,r)=>row.forEach((v,c)=>{if(v)b[p.y+r][p.x+c]=v;}));
 }
 
 function clearLines(b) {
-  let n = 0;
-  for (let r = ROWS-1; r >= 0; r--) {
-    if (b[r].every(v => v)) { b.splice(r,1); b.unshift(new Array(COLS).fill(0)); n++; r++; }
-  }
+  let n=0;
+  for (let r=ROWS-1;r>=0;r--)
+    if(b[r].every(v=>v)){b.splice(r,1);b.unshift(new Array(COLS).fill(0));n++;r++;}
   return n;
 }
 
-function ghostY(b, p) {
-  let dy = 0;
-  while (!collides(b, p, 0, dy+1)) dy++;
-  return p.y + dy;
+function ghostY(b,p) {
+  let dy=0;
+  while(!collides(b,p,0,dy+1)) dy++;
+  return p.y+dy;
 }
 
 // =====================================================
 //  DRAWING
 // =====================================================
-function drawCell(c, x, y, id, alpha=1) {
+function drawCell(c,x,y,id) {
   if (!id) return;
-  c.globalAlpha = alpha;
   c.fillStyle = COLORS[id];
   c.fillRect(x*CELL+1, y*CELL+1, CELL-2, CELL-2);
   c.fillStyle = 'rgba(255,255,255,0.25)';
   c.fillRect(x*CELL+1, y*CELL+1, CELL-2, 4);
   c.fillRect(x*CELL+1, y*CELL+1, 4, CELL-2);
-  c.globalAlpha = 1;
 }
 
 function drawBoard() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-  ctx.lineWidth = 1;
-  for (let r = 0; r < ROWS; r++)
-    for (let c = 0; c < COLS; c++)
-      ctx.strokeRect(c*CELL, r*CELL, CELL, CELL);
-
-  board.forEach((row, r) => row.forEach((v, c) => drawCell(ctx, c, r, v)));
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+  for (let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) ctx.strokeRect(c*CELL,r*CELL,CELL,CELL);
+  board.forEach((row,r)=>row.forEach((v,c)=>drawCell(ctx,c,r,v)));
 
   if (piece) {
-    const gy = ghostY(board, piece);
-    piece.shape.forEach((row, r) => {
-      row.forEach((v, c) => {
-        if (!v) return;
-        if (gy + r !== piece.y + r) {
-          ctx.globalAlpha = 0.2;
-          ctx.fillStyle = COLORS[piece.id];
-          ctx.fillRect((piece.x+c)*CELL+1, (gy+r)*CELL+1, CELL-2, CELL-2);
-          ctx.strokeStyle = COLORS[piece.id];
-          ctx.strokeRect((piece.x+c)*CELL+1, (gy+r)*CELL+1, CELL-2, CELL-2);
-          ctx.globalAlpha = 1;
-        }
-      });
-    });
-    piece.shape.forEach((row, r) => row.forEach((v, c) => { if (v) drawCell(ctx, piece.x+c, piece.y+r, piece.id); }));
+    const gy = ghostY(board,piece);
+    piece.shape.forEach((row,r)=>row.forEach((v,c)=>{
+      if (!v) return;
+      if (gy+r !== piece.y+r) {
+        ctx.globalAlpha=0.2; ctx.fillStyle=COLORS[piece.id];
+        ctx.fillRect((piece.x+c)*CELL+1,(gy+r)*CELL+1,CELL-2,CELL-2);
+        ctx.strokeStyle=COLORS[piece.id];
+        ctx.strokeRect((piece.x+c)*CELL+1,(gy+r)*CELL+1,CELL-2,CELL-2);
+        ctx.globalAlpha=1;
+      }
+    }));
+    piece.shape.forEach((row,r)=>row.forEach((v,c)=>{if(v)drawCell(ctx,piece.x+c,piece.y+r,piece.id);}));
   }
 }
 
 function drawNext() {
-  nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+  nextCtx.clearRect(0,0,nextCanvas.width,nextCanvas.height);
   if (!nextPiece) return;
-  const s = nextPiece.shape;
-  const ox = Math.floor((4 - s[0].length) / 2);
-  const oy = Math.floor((3 - s.length) / 2);
-  s.forEach((row, r) => {
-    row.forEach((v, c) => {
-      if (!v) return;
-      nextCtx.fillStyle = COLORS[v];
-      nextCtx.fillRect((ox+c)*28+4, (oy+r)*26+4, 26, 24);
-      nextCtx.fillStyle = 'rgba(255,255,255,0.25)';
-      nextCtx.fillRect((ox+c)*28+4, (oy+r)*26+4, 26, 4);
-    });
-  });
+  const s=nextPiece.shape;
+  const ox=Math.floor((4-s[0].length)/2), oy=Math.floor((3-s.length)/2);
+  const cw=nextCanvas.width/4, ch=nextCanvas.height/3;
+  s.forEach((row,r)=>row.forEach((v,c)=>{
+    if (!v) return;
+    nextCtx.fillStyle=COLORS[v];
+    nextCtx.fillRect((ox+c)*cw+2,(oy+r)*ch+2,cw-2,ch-2);
+    nextCtx.fillStyle='rgba(255,255,255,0.25)';
+    nextCtx.fillRect((ox+c)*cw+2,(oy+r)*ch+2,cw-2,4);
+  }));
 }
 
 // =====================================================
@@ -540,28 +605,23 @@ function spawnPiece() {
   piece = nextPiece || randomPiece();
   nextPiece = randomPiece();
   drawNext();
-  if (collides(board, piece)) {
-    gameOver = true;
-    stopBGM();
-    sfxGameOver();
-    showOverlay('ゲームオーバー', `スコア: ${score}`, 'もう一度プレイ');
+  if (collides(board,piece)) {
+    gameOver=true; stopBGM(); sfxGameOver();
+    showOverlay('ゲームオーバー',`スコア: ${score}`,'もう一度プレイ');
   }
 }
 
 function drop() {
-  if (!collides(board, piece, 0, 1)) {
-    piece.y++;
-  } else {
-    merge(board, piece);
-    const n = clearLines(board);
-    if (n > 0) {
-      score += LINE_SCORES[n] * level;
-      lines += n;
-      level = Math.floor(lines / 10) + 1;
-      dropInterval = Math.max(100, 1000 - (level-1)*90);
-      scoreDisplay.textContent = score;
-      levelBadge.textContent   = level;
-      linesBadge.textContent   = lines;
+  if (!collides(board,piece,0,1)) { piece.y++; } else {
+    merge(board,piece);
+    const n=clearLines(board);
+    if (n>0) {
+      score+=LINE_SCORES[n]*level; lines+=n;
+      level=Math.floor(lines/10)+1;
+      dropInterval=Math.max(100,1000-(level-1)*90);
+      scoreDisplay.textContent=score;
+      levelBadge.textContent=level;
+      linesBadge.textContent=lines;
       sfxLineClear(n);
     }
     spawnPiece();
@@ -569,93 +629,133 @@ function drop() {
 }
 
 function hardDrop() {
-  const dy = ghostY(board, piece) - piece.y;
-  piece.y += dy;
-  score += dy * 2;
-  scoreDisplay.textContent = score;
-  sfxDrop();
-  drop();
+  const dy=ghostY(board,piece)-piece.y;
+  piece.y+=dy; score+=dy*2;
+  scoreDisplay.textContent=score;
+  sfxDrop(); drop();
 }
 
-function move(dir) {
-  if (!collides(board, piece, dir, 0)) piece.x += dir;
-}
+function move(dir) { if(!collides(board,piece,dir,0)) piece.x+=dir; }
 
 function rotatePiece() {
-  const rot = rotate(piece.shape);
-  if      (!collides(board, piece,  0, 0, rot)) { piece.shape = rot; }
-  else if (!collides(board, piece,  1, 0, rot)) { piece.shape = rot; piece.x += 1; }
-  else if (!collides(board, piece, -1, 0, rot)) { piece.shape = rot; piece.x -= 1; }
+  const rot=rotate(piece.shape);
+  if      (!collides(board,piece, 0,0,rot)) { piece.shape=rot; }
+  else if (!collides(board,piece, 1,0,rot)) { piece.shape=rot; piece.x+=1; }
+  else if (!collides(board,piece,-1,0,rot)) { piece.shape=rot; piece.x-=1; }
 }
 
 function gameLoop(ts) {
-  if (!paused && !gameOver) {
-    dropCounter += ts - lastTime;
-    if (dropCounter >= dropInterval) { drop(); dropCounter = 0; }
+  if (!paused&&!gameOver) {
+    dropCounter+=ts-lastTime;
+    if (dropCounter>=dropInterval) { drop(); dropCounter=0; }
   }
-  lastTime = ts;
-  drawBoard();
-  animId = requestAnimationFrame(gameLoop);
+  lastTime=ts; drawBoard();
+  animId=requestAnimationFrame(gameLoop);
 }
 
 function startGame() {
-  board = createBoard();
-  score = 0; level = 1; lines = 0;
-  gameOver = false; paused = false;
-  dropInterval = 1000; dropCounter = 0; lastTime = 0;
-  scoreDisplay.textContent = '0';
-  levelBadge.textContent   = '1';
-  linesBadge.textContent   = '0';
-  nextPiece = randomPiece();
-  spawnPiece();
-  overlay.style.display = 'none';
+  board=createBoard();
+  score=0; level=1; lines=0;
+  gameOver=false; paused=false;
+  dropInterval=1000; dropCounter=0; lastTime=0;
+  scoreDisplay.textContent='0';
+  levelBadge.textContent='1';
+  linesBadge.textContent='0';
+  nextPiece=randomPiece(); spawnPiece();
+  overlay.style.display='none';
   cancelAnimationFrame(animId);
-  animId = requestAnimationFrame(gameLoop);
+  animId=requestAnimationFrame(gameLoop);
   startBGM();
 }
 
 function showOverlay(title, sub, btnText) {
-  overlay.innerHTML = `
-    <h2>${title}</h2>
-    <p>${sub}</p>
-    <button id="start-btn">${btnText}</button>
-  `;
-  overlay.style.display = 'flex';
+  overlay.innerHTML=`<h2>${title}</h2><p>${sub}</p><button id="start-btn">${btnText}</button>`;
+  overlay.style.display='flex';
   overlay.querySelector('#start-btn').addEventListener('click', startGame);
 }
 
 // =====================================================
-//  EVENT HANDLERS
+//  KEYBOARD
 // =====================================================
 startBtn.addEventListener('click', startGame);
-bgmBtn.addEventListener('click', toggleBGM);
+if (bgmBtn) bgmBtn.addEventListener('click', toggleBGM);
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyM') { toggleBGM(); return; }
+  if (e.code==='KeyM') { toggleBGM(); return; }
   if (gameOver) return;
-
-  switch (e.code) {
+  switch(e.code) {
     case 'ArrowLeft':  e.preventDefault(); move(-1); break;
     case 'ArrowRight': e.preventDefault(); move(1);  break;
     case 'ArrowDown':  e.preventDefault(); drop();   break;
     case 'ArrowUp':    e.preventDefault(); rotatePiece(); break;
     case 'Space':      e.preventDefault(); hardDrop(); break;
     case 'KeyP':
-      paused = !paused;
+      paused=!paused;
       if (paused) {
         stopBGM();
-        overlay.innerHTML = `<h2 style="color:#4a90d9">一時停止中</h2><p>Pキーで再開</p>`;
-        overlay.style.display = 'flex';
+        overlay.innerHTML=`<h2 style="color:#4a90d9">一時停止中</h2><p>Pキーで再開</p>`;
+        overlay.style.display='flex';
       } else {
-        overlay.style.display = 'none';
-        lastTime = performance.now();
-        dropCounter = 0;
+        overlay.style.display='none';
+        lastTime=performance.now(); dropCounter=0;
         startBGM();
       }
       break;
   }
   if (!paused) drawBoard();
 });
+
+// =====================================================
+//  TOUCH CONTROLS
+// =====================================================
+(function setupTouch() {
+  // Auto-repeat helper for move/drop buttons
+  function addRepeat(id, action) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    let timer = null;
+
+    function start() {
+      if (gameOver || paused) return;
+      action(); drawBoard();
+      timer = setTimeout(function repeat() {
+        if (gameOver || paused) { stop(); return; }
+        action(); drawBoard();
+        timer = setTimeout(repeat, 80);
+      }, 220);
+    }
+    function stop() { clearTimeout(timer); timer = null; }
+
+    btn.addEventListener('touchstart', e => { e.preventDefault(); start(); }, {passive:false});
+    btn.addEventListener('touchend',   e => { e.preventDefault(); stop();  }, {passive:false});
+    btn.addEventListener('touchcancel',e => { e.preventDefault(); stop();  }, {passive:false});
+    // Also mouse for desktop testing
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('mouseup',   stop);
+    btn.addEventListener('mouseleave',stop);
+  }
+
+  // One-shot helper for rotate / hard drop
+  function addTap(id, action) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (gameOver || paused) return;
+      action(); drawBoard();
+    }, {passive:false});
+    btn.addEventListener('mousedown', () => {
+      if (gameOver || paused) return;
+      action(); drawBoard();
+    });
+  }
+
+  addRepeat('btn-left',  () => move(-1));
+  addRepeat('btn-right', () => move(1));
+  addRepeat('btn-down',  () => drop());
+  addTap('btn-rotate', () => rotatePiece());
+  addTap('btn-hard',   () => hardDrop());
+})();
 </script>
 </body>
 </html>
